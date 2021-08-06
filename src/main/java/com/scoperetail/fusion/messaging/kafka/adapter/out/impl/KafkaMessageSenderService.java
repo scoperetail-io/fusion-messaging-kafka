@@ -1,4 +1,4 @@
-package com.scoperetail.messaging.kafka.adapter.out.impl;
+package com.scoperetail.fusion.messaging.kafka.adapter.out.impl;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -6,7 +6,7 @@ import java.util.Map;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import com.scoperetail.messaging.kafka.adapter.out.KafkaMessageSender;
+import com.scoperetail.fusion.messaging.kafka.adapter.out.KafkaMessageSender;
 
 @Service
 public class KafkaMessageSenderService implements KafkaMessageSender {

@@ -1,4 +1,4 @@
-package com.scoperetail.messaging.kafka.adapter.out;
+package com.scoperetail.fusion.messaging.kafka.adapter.out;
 
 import org.springframework.kafka.core.KafkaTemplate;
 
