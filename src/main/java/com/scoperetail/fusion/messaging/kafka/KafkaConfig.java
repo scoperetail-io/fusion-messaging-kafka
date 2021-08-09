@@ -94,16 +94,15 @@ public class KafkaConfig implements InitializingBean {
     configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
     configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
     configProps.put(SaslConfigs.SASL_MECHANISM, "SCRAM-SHA-256");
+    configProps.put("security.protocol", "SASL_SSL");
     configProps.put(
         SaslConfigs.SASL_JAAS_CONFIG,
         "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"kafkaclient\" password=\"password\";");
-    configProps.put("security.protocol", "SASL_SSL");
-    configProps.put("ssl.trust-store-location", "file:///appl/ca/kafka.consumer.truststore.jks");
-    configProps.put("ssl.trust-store-password", "confluent");
+    configProps.put("ssl.truststore.location", "/appl/ca/kafka.consumer.truststore.jks");
+    configProps.put("ssl.truststore.password", "confluent");
     configProps.put("listener.ack-mode", "manual_immediate");
     configProps.put("retry.backoff.ms", "10000");
     configProps.put("retries", "3");
-
     return configProps;
   }
 
@@ -159,8 +158,9 @@ public class KafkaConfig implements InitializingBean {
     registry.registerBeanDefinition(
         brokerId + CUSTOM_KAFKA_TEMPLATE, templateBeanDefinitionBuilder.getBeanDefinition());
 
-    final KafkaTemplate kafkaTemplate =
-        (KafkaTemplate) applicationContext.getBean(brokerId + CUSTOM_KAFKA_TEMPLATE);
+    final KafkaTemplate<String, String> kafkaTemplate =
+        (KafkaTemplate<String, String>)
+            applicationContext.getBean(brokerId + CUSTOM_KAFKA_TEMPLATE);
 
     kafkaMessageSender.registerKafkaTemplate(brokerId, kafkaTemplate);
 
