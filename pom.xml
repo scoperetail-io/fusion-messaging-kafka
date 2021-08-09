@@ -3,7 +3,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.scoperetail.fusion</groupId>
 	<artifactId>fusion-messaging-kafka</artifactId>
-	<version>0.1</version>
+	<version>0.2-SNAPSHOT</version>
 	<name>fusion-messaging-kafka</name>
 	<description>Generic kafka Messaging implementation</description>
 	<url>https://github.com/scoperetail-io/${project.artifactId}</url>
@@ -25,7 +25,7 @@
 
 	<scm>
 		<connection>scm:git:git@github.com:scoperetail-io/${project.artifactId}.git</connection>
-		<tag>fusion-messaging-kafka-0.1</tag>
+		<tag>HEAD</tag>
 		<url>https://github.com/scoperetail-io/${project.artifactId}</url>
 	</scm>
 
