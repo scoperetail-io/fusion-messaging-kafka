@@ -1,89 +1,36 @@
 # Use the latest 2.1 version of CircleCI pipeline process engine.
 # See: https://circleci.com/docs/2.0/configuration-reference
 version: 2.1
-commands:
-  restore_cache_cmd:
-    description: "Restore Cache"
-    steps:
-      - restore_cache:
-          keys:
-            - v1-dependencies-{{ checksum "pom.xml" }}
-            # fallback to using the latest cache if no exact match is found
-            - v1-dependencies-
-  save_cache_cmd:
-    description: "Save Cache"
-    steps:
-      - save_cache:
-          paths:
-            - ~/.m2
-          key: v1-dependencies-{{ checksum "pom.xml" }}
-  import_gpg_key:
-    description: "Import GPG Key needed for signing"
-    steps:
-      - run:
-          name: import GPG key
-          command: echo -e "$GPG_KEY" | gpg --import
-  mvn_package:
-    description: "Maven clean and package"
-    steps:
-      - run:
-          name: Package
-          command: mvn -DskipTests clean package
-  mvn_test:
-    description: "Maven Test"
-    steps:
-      - run:
-          name: Test
-          command: mvn test
-  mvn_release:
-    description: "Maven Release"
-    steps:
-      - run:
-          name: Release
-          command: |
-            git config --global user.email "tushar.agrawal@scoperetail.com"
-            git config --global user.name "scoperetail"
-            mvn -s .circleci/.maven.xml -Darguments="-DskipTests" -B release:prepare release:perform -Prelease
-  mvn_sonar:
-    description: "Maven Sonar"
-    steps:
-      - run:
-          name: Verify and Sonar Scan
-          command: mvn sonar:sonar
-
-executors:
-  java11_executor:
-    docker:
-      - image: cimg/openjdk:11.0
-
-jobs:
-  build-and-test-java11:
-    executor: java11_executor
-    steps:
-      - checkout
-      - restore_cache_cmd
-      - mvn_package
-      - mvn_test
-      - mvn_sonar
-      - save_cache_cmd
-  build-and-release-java11:
-    executor: java11_executor
-    steps:
-      - checkout
-      - import_gpg_key
-      - restore_cache_cmd
-      - mvn_release
-      - save_cache_cmd
+orbs:
+  marvel: scoperetail/marvel@2.1.0
 
 workflows:
   build-and-test:
     jobs:
-      - build-and-test-java11:
-          context: OSSRH
-      - build-and-release-java11:
-          context: OSSRH
+      - marvel/maven-deploy:
+          context:
+            - OSSRH
+            - SLACK
           filters:
             branches:
-              only: 
-                  - master
-                  - main
+              ignore:
+                - master
+                - /HOTFIX-.*/
+      - marvel/sonar-scan:
+          context:
+            - OSSRH
+            - SLACK
+          filters:
+            branches:
+              ignore:
+                - master
+                - /HOTFIX-.*/
+      - marvel/maven-release:
+          context:
+            - OSSRH
+            - SLACK
+          filters:
+            branches:
+              only:
+                - master
+                - /HOTFIX-.*/
