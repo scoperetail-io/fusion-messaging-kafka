@@ -9,7 +9,6 @@ import java.util.stream.Collectors;
 
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.config.SaslConfigs;
-import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.beans.factory.support.BeanDefinitionBuilder;
 import org.springframework.beans.factory.support.BeanDefinitionRegistry;
@@ -23,6 +22,8 @@ import com.scoperetail.fusion.messaging.adapter.JmsProvider;
 import com.scoperetail.fusion.messaging.config.Adapter;
 import com.scoperetail.fusion.messaging.config.Broker;
 import com.scoperetail.fusion.messaging.config.FusionConfig;
+import com.scoperetail.fusion.messaging.config.KafkaProducer;
+import com.scoperetail.fusion.messaging.config.KafkaSecurityConfig;
 import com.scoperetail.fusion.messaging.kafka.adapter.out.KafkaMessageSender;
 
 import lombok.AllArgsConstructor;
@@ -90,19 +91,22 @@ public class KafkaConfig implements InitializingBean {
 
   public Map<String, Object> getConfigs(final Broker broker) {
     final Map<String, Object> configProps = new HashMap<>();
+    final KafkaProducer kafkaProducer = broker.getKafkaProducer();
+    final KafkaSecurityConfig kafkaSecurityConfig = broker.getKafkaSecurityConfig();
+
     configProps.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, broker.getHostUrl());
-    configProps.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-    configProps.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-    configProps.put(SaslConfigs.SASL_MECHANISM, "SCRAM-SHA-256");
-    configProps.put("security.protocol", "SASL_SSL");
     configProps.put(
-        SaslConfigs.SASL_JAAS_CONFIG,
-        "org.apache.kafka.common.security.scram.ScramLoginModule required username=\"kafkaclient\" password=\"password\";");
-    configProps.put("ssl.truststore.location", "/appl/ca/kafka.consumer.truststore.jks");
-    configProps.put("ssl.truststore.password", "confluent");
-    configProps.put("listener.ack-mode", "manual_immediate");
-    configProps.put("retry.backoff.ms", "10000");
-    configProps.put("retries", "3");
+        ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, kafkaProducer.getKeySerializerClass());
+    configProps.put(
+        ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, kafkaProducer.getValueSerializerClass());
+    configProps.put("retry.backoff.ms", kafkaProducer.getRetryBackoffMs());
+    configProps.put("retries", kafkaProducer.getRetries());
+    configProps.put(SaslConfigs.SASL_MECHANISM, kafkaSecurityConfig.getSaslMechanism());
+    configProps.put("security.protocol", kafkaSecurityConfig.getSecurityProtocol());
+    configProps.put(SaslConfigs.SASL_JAAS_CONFIG, kafkaSecurityConfig.getSaslJaasConfig());
+    configProps.put("ssl.truststore.location", kafkaSecurityConfig.getSslTruststoreLocation());
+    configProps.put("ssl.truststore.password", kafkaSecurityConfig.getSslTruststorePassword());
+    configProps.put("listener.ack-mode", kafkaSecurityConfig.getListenerAckMode());
     return configProps;
   }
 
@@ -158,9 +162,8 @@ public class KafkaConfig implements InitializingBean {
     registry.registerBeanDefinition(
         brokerId + CUSTOM_KAFKA_TEMPLATE, templateBeanDefinitionBuilder.getBeanDefinition());
 
-    final KafkaTemplate<String, String> kafkaTemplate =
-        (KafkaTemplate<String, String>)
-            applicationContext.getBean(brokerId + CUSTOM_KAFKA_TEMPLATE);
+    final KafkaTemplate kafkaTemplate =
+        (KafkaTemplate) applicationContext.getBean(brokerId + CUSTOM_KAFKA_TEMPLATE);
 
     kafkaMessageSender.registerKafkaTemplate(brokerId, kafkaTemplate);
 
