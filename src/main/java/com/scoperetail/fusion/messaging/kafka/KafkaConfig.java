@@ -9,9 +9,9 @@ package com.scoperetail.fusion.messaging.kafka;
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
- * 
+ *
  *      http://www.apache.org/licenses/LICENSE-2.0
- * 
+ *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
  * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
@@ -132,32 +132,27 @@ public class KafkaConfig implements InitializingBean {
     fusionConfig
         .getUsecases()
         .forEach(
-            usecase -> {
-              final String activeConfig = usecase.getActiveConfig();
-              usecase
-                  .getConfigs()
-                  .stream()
-                  .filter(config -> activeConfig.equals(config.getName()))
-                  .findFirst()
-                  .ifPresent(
-                      config -> {
-                        final List<Adapter> adapters =
-                            config
-                                .getAdapters()
-                                .stream()
-                                .filter(
-                                    c ->
-                                        c.getAdapterType().equals(Adapter.AdapterType.OUTBOUND)
-                                            && c.getTrasnportType()
-                                                .equals(Adapter.TransportType.KAFKA))
-                                .collect(Collectors.toList());
-                        uniqueBrokerIds.addAll(
-                            adapters
-                                .stream()
-                                .map(Adapter::getBrokerId)
-                                .collect(Collectors.toSet()));
-                      });
-            });
+            usecase ->
+                fusionConfig
+                    .getActiveConfig(usecase.getName())
+                    .ifPresent(
+                        config -> {
+                          final List<Adapter> adapters =
+                              config
+                                  .getAdapters()
+                                  .stream()
+                                  .filter(
+                                      c ->
+                                          c.getAdapterType().equals(Adapter.AdapterType.OUTBOUND)
+                                              && c.getTrasnportType()
+                                                  .equals(Adapter.TransportType.KAFKA))
+                                  .collect(Collectors.toList());
+                          uniqueBrokerIds.addAll(
+                              adapters
+                                  .stream()
+                                  .map(Adapter::getBrokerId)
+                                  .collect(Collectors.toSet()));
+                        }));
     return uniqueBrokerIds;
   }
 
