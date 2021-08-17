@@ -12,7 +12,7 @@
 	<properties>
 		<java.version>11</java.version>
 		<lombok.version>1.18.12</lombok.version>
-		<fusion-config.version>0.1</fusion-config.version>
+		<fusion-config.version>0.2</fusion-config.version>
 		<sonar.projectKey>scoperetail-io_${project.artifactId}</sonar.projectKey>
 		<sonar.organization>scoperetail-io</sonar.organization>
 		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
