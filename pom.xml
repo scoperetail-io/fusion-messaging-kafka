@@ -1,48 +1,46 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
+	<parent>
+		<groupId>com.scoperetail.pom</groupId>
+		<artifactId>oss-parent-pom</artifactId>
+		<version>1.6</version>
+		<relativePath />
+	</parent>
 	<groupId>com.scoperetail.fusion</groupId>
 	<artifactId>fusion-messaging-kafka</artifactId>
 	<version>0.2-SNAPSHOT</version>
-	<name>fusion-messaging-kafka</name>
-	<description>Generic kafka Messaging implementation</description>
+	<name>${project.artifactId}</name>
+	<description>Fusion Messaging Kafka</description>
 	<url>https://github.com/scoperetail-io/${project.artifactId}</url>
 	<properties>
-		<java.version>11</java.version>
-		<lombok.version>1.18.12</lombok.version>
-		<fusion-messaging.version>0.11</fusion-messaging.version>
-		<sonar.projectKey>scoperetail-io_${project.artifactId}</sonar.projectKey>
-		<sonar.organization>scoperetail-io</sonar.organization>
-		<sonar.host.url>https://sonarcloud.io</sonar.host.url>
-		<license-maven-plugin.version>2.0.0</license-maven-plugin.version>
-		<sonar.exclusions>
-			com/**/**Test**.java
-		</sonar.exclusions>
-		<sonar.core.codeCoveragePlugin>jacoco</sonar.core.codeCoveragePlugin>
-		<sonar.jacoco.reportPath>${project.basedir}/target/jacoco.exec</sonar.jacoco.reportPath>
-		<sonar.language>java</sonar.language>
+		<fusion-config.version>0.2</fusion-config.version>
+		<spring-kafka.version>2.7.2</spring-kafka.version>
 	</properties>
 
 	<scm>
-		<connection>scm:git:git@github.com:scoperetail-io/${project.artifactId}.git</connection>
+		<developerConnection>
+            scm:git:git@github.com:scoperetail-io/${project.artifactId}.git
+        </developerConnection>
 		<tag>HEAD</tag>
 		<url>https://github.com/scoperetail-io/${project.artifactId}</url>
 	</scm>
 
-	<licenses>
-		<license>
-			<name>Apache License, Version 2.0</name>
-			<url>https://www.apache.org/licenses/LICENSE-2.0.txt</url>
-			<distribution>repo</distribution>
-		</license>
-	</licenses>
-
 	<developers>
 		<developer>
-			<id>Scoperetail</id>
-			<name>Scoperetail Development Team</name>
+			<id>SI003</id>
+			<name>Ravi Zadpide</name>
 			<roles>
-				<role>Project Lead</role>
+				<role>Developer</role>
+			</roles>
+		</developer>
+		<developer>
+			<id>SI002</id>
+			<name>Amit Petkar</name>
+			<roles>
+				<role>Architect</role>
 			</roles>
 		</developer>
 	</developers>
@@ -51,155 +49,18 @@
 		<dependency>
 			<groupId>org.springframework.kafka</groupId>
 			<artifactId>spring-kafka</artifactId>
-			<version>2.7.2</version>
+			<version>${spring-kafka.version}</version>
 		</dependency>
 		<dependency>
 			<groupId>org.projectlombok</groupId>
 			<artifactId>lombok</artifactId>
-			<version>${lombok.version}</version><!--$NO-MVN-MAN-VER$ -->
+			<version>${lombok.version}</version>
 			<scope>provided</scope>
 		</dependency>
 		<dependency>
 			<groupId>com.scoperetail.fusion</groupId>
-			<artifactId>fusion-messaging</artifactId>
-			<version>${fusion-messaging.version}</version>
+			<artifactId>fusion-config</artifactId>
+			<version>${fusion-config.version}</version>
 		</dependency>
 	</dependencies>
-
-	<build>
-		<plugins>
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-compiler-plugin</artifactId>
-				<version>3.8.0</version>
-				<configuration>
-					<release>11</release>
-					<annotationProcessorPaths>
-						<path>
-							<groupId>org.projectlombok</groupId>
-							<artifactId>lombok</artifactId>
-							<version>${lombok.version}</version>
-						</path>
-					</annotationProcessorPaths>
-					<generatedSourcesDirectory>${project.build.directory}/generated-sources</generatedSourcesDirectory>
-				</configuration>
-			</plugin>
-
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-release-plugin</artifactId>
-				<version>2.5.3</version>
-				<configuration>
-					<scmCommentPrefix>[skip ci]</scmCommentPrefix>
-				</configuration>
-			</plugin>
-			<plugin>
-				<groupId>org.jacoco</groupId>
-				<artifactId>jacoco-maven-plugin</artifactId>
-				<version>0.8.2</version>
-				<executions>
-					<execution>
-						<goals>
-							<goal>prepare-agent</goal>
-						</goals>
-					</execution>
-					<execution>
-						<id>report</id>
-						<phase>prepare-package</phase>
-						<goals>
-							<goal>report</goal>
-						</goals>
-					</execution>
-				</executions>
-			</plugin>
-			
-			<plugin>
-				<groupId>org.codehaus.mojo</groupId>
-				<artifactId>license-maven-plugin</artifactId>
-				<version>${license-maven-plugin.version}</version>
-				<executions>
-					<execution>
-						<id>first</id>
-						<goals>
-							<goal>update-file-header</goal>
-						</goals>
-						<phase>process-sources</phase>
-					</execution>
-				</executions>
-				<configuration>
-					<verbose>false</verbose>
-					<licenseName>apache_v2</licenseName>
-					<organizationName>Scope Retail Systems Inc.</organizationName>
-					<projectName>${project.name}</projectName>
-					<inceptionYear>2018</inceptionYear>
-					<processStartTag>*****</processStartTag>
-					<sectionDelimiter>-----</sectionDelimiter>
-					<processEndTag>=====</processEndTag>
-					<roots>
-						<root>src/main/java</root>
-						<root>src/test/java</root>
-					</roots>
-					<extraExtensions>
-						<tsx>java</tsx>
-					</extraExtensions>
-				</configuration>
-			</plugin>
-		</plugins>
-	</build>
-	<distributionManagement>
-		<snapshotRepository>
-			<id>ossrh</id>
-			<url>https://s01.oss.sonatype.org/content/repositories/snapshots</url>
-		</snapshotRepository>
-		<repository>
-			<id>ossrh</id>
-			<url>https://s01.oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-		</repository>
-	</distributionManagement>
-	<profiles>
-		<profile>
-			<id>release</id>
-			<build>
-				<plugins>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-source-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>attach-sources</id>
-								<goals>
-									<goal>jar-no-fork</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-javadoc-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>attach-javadocs</id>
-								<goals>
-									<goal>jar</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-					<plugin>
-						<groupId>org.apache.maven.plugins</groupId>
-						<artifactId>maven-gpg-plugin</artifactId>
-						<executions>
-							<execution>
-								<id>sign-artifacts</id>
-								<phase>verify</phase>
-								<goals>
-									<goal>sign</goal>
-								</goals>
-							</execution>
-						</executions>
-					</plugin>
-				</plugins>
-			</build>
-		</profile>
-	</profiles>
 </project>
